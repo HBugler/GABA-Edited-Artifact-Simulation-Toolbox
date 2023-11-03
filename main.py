@@ -124,9 +124,9 @@ for groundTruthNumber in range(0, totalGroundTruths):                         # 
     # METRIC CALCULATIONS FOR SNR, LINEWIDTH AND SHAPE SCORE
     ########################################################################################################################
     # GET METRICS FOR ALL (NORMAL + CORRUPT) TRANSIENTS
-    normalTransients.GABA_snr = normalTransients.get_SNR(diff_normal_specs, single='no', metab='GABA')
+    normalTransients.GABA_snr = normalTransients.get_SNR(diff_normal_specs, single='no',)
     normalTransients.ss = normalTransients.get_ShapeScore(diff_normal_specs, diff_gt_spec, single='no')
-    normalTransients.GABA_lw = normalTransients.get_LW(diff_normal_specs, single='no', metab='GABA')
+    normalTransients.GABA_lw = normalTransients.get_LW(diff_normal_specs, single='no')
 
     #######################################################################################################################
     # Print Scan Results and Save Values

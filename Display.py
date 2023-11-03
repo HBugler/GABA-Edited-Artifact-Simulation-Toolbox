@@ -5,7 +5,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def display_artifact(diff_gt_fid, diff_gt_spec, transientObject, artifact_name=None, location=[]):
-# code to display individual transient artifact (by default, displays first artifact in location array)
+    '''
+    Code to display individual transient artifact (by default, displays first artifact in location array).
+
+    :param diff_gt_fid: ground truth difference (ON- OFF) FID (time domain).
+    :param diff_gt_spec: ground truth difference (ON - OFF) SPEC (frequency domain).
+    :param transientObject: transient maker object corresponding to the corrupt transients.
+    :param artifact_name: name of artifact.
+    :param location: locations (within the corrupt transient object) of the artifact(s).
+    :return: None
+    '''
+
     # get difference FID and Spec
     on_corr_specs, off_corr_specs = np.copy(transientObject.get_specs())
     on_corr_specs, off_corr_specs = on_corr_specs[0, :, location[0]], off_corr_specs[0, :, location[0]]
@@ -37,8 +47,15 @@ def display_artifact(diff_gt_fid, diff_gt_spec, transientObject, artifact_name=N
     plt.show()
 
 
-def display_transToDate(transientObject, gt=None):
-# code to display transients to date
+def display_transToDate(transientObject, diff_gt_spec=None):
+    '''
+    Code to display transients to date.
+
+    :param transientObject: transient maker object corresponding to current transients.
+    :param diff_gt_spec: ground truth difference (ON - OFF) SPECs (frequency domain).
+    :return: None
+    '''
+
     # get difference spec
     on_specs, off_specs = transientObject.get_specs()
     diff_specs = np.real(on_specs - off_specs)
@@ -49,7 +66,7 @@ def display_transToDate(transientObject, gt=None):
         ax.plot(transientObject.ppm, diff_specs[0, :, i], linewidth=1, alpha=0.5)
 
     # PLOT OVER THE INDIVIDUAL TRANSIENTS THE MEAN SPECTRUM AND GROUND TRUTH SPECTRUM
-    ax.plot(transientObject.ppm, np.real(gt), 'k', linewidth=2, label='Ground Truth Spectrum')
+    ax.plot(transientObject.ppm, np.real(diff_gt_spec), 'k', linewidth=2, label='Ground Truth Spectrum')
     ax.plot(transientObject.ppm, diff_specs.mean(axis=2).flatten(), 'r', linewidth=2, label='Mean Spectrum')
     ax.set_title("Transients-to-Date")
     ax.set_xlim(1.0, 5.0)
@@ -62,6 +79,13 @@ def display_transToDate(transientObject, gt=None):
 
 
 def saveData(all_specs, all_fids):
-    # save specs and quality labels to .npy file
+    '''
+    Save specs and quality labels to .npy file.
+
+    :param all_specs: all SPECs in difference complex form (frequency domain ON - OFF).
+    :param all_fids: all FIDs in difference complex form (time domain ON - OFF).
+    :return: None
+    '''
+
     np.save("SPECS.npy", all_specs)
     np.save("FIDS.npy", all_fids)

@@ -338,7 +338,7 @@ class TransientMaker:
         '''
         Adds a baseline contamination caused by the lipid contamination between 1.5 and 1.6 ppm to the same
         transients as identified by self.LP_locations in the lipid_peak_contamination function.
-        The following attributes need to be defined: self.LP_locations
+        The following attributes need to be defined: self.LP_locations.
 
         :return: None
         '''
@@ -365,18 +365,22 @@ class TransientMaker:
     ########################################################################################################################
     # Metric functions
     ########################################################################################################################
-    def get_SNR(self, specs, single='no', metab='GABA'):
-        # Signal-to-Noise Ratio (Mikkelsen et al. (2017) - Big GABA: Edited MRS at 24 research sites)
+    def get_SNR(self, specs, single='no'):
+        '''
+        Get GABA signal-to-noise ratio (SNR).
+        Signal-to-Noise Ratio (Mikkelsen et al. (2017) - Big GABA: Edited MRS at 24 research sites)
+
+        :param specs: frequency domain difference transients in form.
+        :param single: specifies whether a single (mean) transient or set (scan) of transients is passed.
+        :return: returns the GABA SNR.
+        '''
+
         # select window and specs set (diff vs. OFF) based on metabolite selected
-        if metab == 'GABA':
-            metab_indClose, metab_indFar = np.amax(np.where(self.ppm >= 2.8)), np.amin(np.where(self.ppm <= 3.2))
-            if single == 'yes':
-                mean_specs = np.real(specs.flatten())
-            else:
-                mean_specs = np.real(specs.mean(axis=2).flatten())
-        elif metab == 'NAA':
-            metab_indClose, metab_indFar = np.amax(np.where(self.ppm >= 1.0)), np.amin(np.where(self.ppm <= 4.0))
-            mean_specs = np.real(self.to_fids[1, :, :].mean(axis=1).flatten())
+        metab_indClose, metab_indFar = np.amax(np.where(self.ppm >= 2.8)), np.amin(np.where(self.ppm <= 3.2))
+        if single == 'yes':
+            mean_specs = np.real(specs.flatten())
+        else:
+            mean_specs = np.real(specs.mean(axis=2).flatten())
         noise_indClose, noise_indFar = np.amax(np.where(self.ppm >= 10.0)), np.amin(np.where(self.ppm <= 11.0))
         noise_ppm = self.ppm[noise_indFar:noise_indClose].shape[0]
 
@@ -388,20 +392,23 @@ class TransientMaker:
 
         return allSNR
 
-    def get_LW(self, specs, single='no', metab='GABA'):
-        # Linewidth in Hertz of GABA or NAA
+
+    def get_LW(self, specs, single='no'):
+        '''
+        Measures the GABA linewidth.
+
+        :param specs: frequency domain difference transients in form.
+        :param single: specifies whether a single (mean) transient or set (scan) of transients is passed.
+        :return: returns the GABA linewidth in hertz.
+        '''
 
         # select window and specs set (diff vs. OFF) based on metabolite selected
-        if metab == 'GABA':
-            metab_indClose, metab_indFar = np.amax(np.where(self.ppm >= 2.9)), np.amin(
-                np.where(self.ppm <= 3.1))  # was 2.8 to 3.2
-            if single == 'yes':
-                mean_specs = np.real(specs.flatten())
-            else:
-                mean_specs = np.real(specs.mean(axis=2).flatten())
-        elif metab == 'NAA':
-            metab_indClose, metab_indFar = np.amax(np.where(self.ppm >= 1.0)), np.amin(np.where(self.ppm <= 4.0))
-            mean_specs = np.real(self.to_fids[1, :, :].mean(axis=1).flatten())
+        metab_indClose, metab_indFar = np.amax(np.where(self.ppm >= 2.9)), np.amin(
+        np.where(self.ppm <= 3.1))  # was 2.8 to 3.2
+        if single == 'yes':
+            mean_specs = np.real(specs.flatten())
+        else:
+            mean_specs = np.real(specs.mean(axis=2).flatten())
 
         # calculate fwhm
         global LHM_x, RHM_x
@@ -422,7 +429,15 @@ class TransientMaker:
 
 
     def get_ShapeScore(self, specs, gt, single='No'):
-        # Shape score as defined in (Berto et al. (2023) - Edited Magnetic Resonance Spectroscopy Reconstruction Challenge)
+        '''
+        Calculates the shape score of GABA and GLX.
+        Shape score as defined in (Berto et al. (2023) - Advancing GABA-Edited MRS Through a Reconstruction Challenge)
+
+        :param specs: frequency domain difference transients in form.
+        :param gt: passes the ground truth difference spectrum (frequency domain).
+        :param single: specifies whether a single (mean) transient or set (scan) of transients is passed.
+        :return: returns the shape score in percentage (decimal) form.
+        '''
 
         # Select windows for metabolites
         gaba_indFar, gaba_indClose = np.amax(np.where(self.ppm >= 2.8)), np.amin(np.where(self.ppm <= 3.2))
@@ -444,7 +459,14 @@ class TransientMaker:
 
 
     def get_OutlierScore(self, specs, single='No'):
-        # Calculates the percentage of points within a window which are outliers compared to the mean (based on 3 standard deviations rule)
+        '''
+        Calculates the percentage of points within a window which are outliers compared to the mean (based on 3 standard deviations rule)
+
+        :param specs: frequency domain difference transients in form.
+        :param single: specifies whether a single (mean) transient or set (scan) of transients is passed.
+        :return: returns the outlier score in percentage (decimal) form.
+        '''
+
         mean_curve = self.nonArtifTrans.mean(axis=2).flatten()
         # Window Selection
         indClose = np.amin(np.where(self.ppm <= 1.09))
@@ -490,14 +512,33 @@ class TransientMaker:
     # Domain functions
     ########################################################################################################################
     def reset_fids(self):
+        '''
+        Resets FIDs to their original (import/ground truth) form.
+
+        :return: None
+        '''
+
         self.fids = self.base_fids_on.repeat(2, axis=0) * self.edit_on.reshape(-1, 1) + self.base_fids_off.repeat(2, axis=0) * (1 - self.edit_on.reshape(-1, 1))
         self.fids = self.fids.reshape(self.fids.shape[0], self.fids.shape[1], 1).repeat(self.transient_count, axis=2)
 
+
     def get_fids(self):
+        '''
+        Provides the ON and OFF FIDs (time domain) in their current state.
+
+        :return: None
+        '''
+
         return self.fids[self.edit_on == 1], self.fids[self.edit_on == 0]
 
 
     def get_specs(self):
+        '''
+        Provides the ON and OFF SPECs (frequency domain) in their current state.
+
+        :return: None
+        '''
+
         on_fids = self.fids[self.edit_on == 1]
         off_fids = self.fids[self.edit_on == 0]
 
@@ -508,40 +549,59 @@ class TransientMaker:
 
 
     def get_differenceSpecs(self):
+        '''
+        Provides the difference SPECs (ON-OFF) (frequency domain) in their current state.
+
+        :return: None
+        '''
+
         return to_specs(self.fids[self.edit_on == 1]) - to_specs(self.fids[self.edit_on == 0])
 
 
     def get_differenceFids(self):
+        '''
+        Provides the difference FIDs (ON-OFF) (time domain) in their current state.
+
+        :return: None
+        '''
+
         return self.fids[self.edit_on == 1] - self.fids[self.edit_on == 0]
 
 
-    def insert_corrupt(self, tm_corr):
-        # The following attributes need to be defined: self.artifact_locations, *attributes for corrupt transient maker object
+    def insert_corrupt(self, corruptTransients):
+        '''
+        Inserts corrupt transients at random locations whithin the typical scan.
+        The following attributes need to be defined: self.artifact_locations, *attributes for corrupt transient maker object.
+
+        :param corruptTransients: corrupt transient object.
+        :return: ON and OFF Specs (Frequency domain)
+        '''
+
         # get both typical and corrupted specs
         on_specs, off_specs = self.get_specs()
-        on_corr_specs, off_corr_specs = tm_corr.get_specs()
+        on_corr_specs, off_corr_specs = corruptTransients.get_specs()
 
         # Select random locations and insert (with replacement) the corrupted transients in the typical scan
-        self.artifact_locations = np.sort(np.random.choice(range(self.transient_count), size=tm_corr.transient_count, replace=False))
-        for i in range(0, tm_corr.transient_count):
+        self.artifact_locations = np.sort(np.random.choice(range(self.transient_count), size=corruptTransients.transient_count, replace=False))
+        for i in range(0, corruptTransients.transient_count):
             on_specs[0, :, self.artifact_locations[i]] = on_corr_specs[0, :, i]
             off_specs[0, :, self.artifact_locations[i]] = off_corr_specs[0, :, i]
 
-        # Get locations of artifacts
-        if any(tm_corr.ghost_locations):
-            for i in range(tm_corr.ghost_locations.shape[0]):
-                tm_corr.ghost_locations[i] = self.artifact_locations[tm_corr.ghost_locations[i]]
-        if any(tm_corr.EC_locations):
-            for j in range(tm_corr.EC_locations.shape[0]):
-                tm_corr.EC_locations[j] = self.artifact_locations[tm_corr.EC_locations[j]]
-        if any(tm_corr.motion_locations):
-            for k in range(tm_corr.motion_locations.shape[0]):
-                tm_corr.motion_locations[k] = self.artifact_locations[tm_corr.motion_locations[k]]
-        if any(tm_corr.LP_locations):
-            for i in range(tm_corr.LP_locations.shape[0]):
-                tm_corr.LP_locations[i] = self.artifact_locations[tm_corr.LP_locations[i]]
+        # Get new locations of artifacts (within the typical scan)
+        if any(corruptTransients.ghost_locations):
+            for i in range(corruptTransients.ghost_locations.shape[0]):
+                corruptTransients.ghost_locations[i] = self.artifact_locations[corruptTransients.ghost_locations[i]]
+        if any(corruptTransients.EC_locations):
+            for j in range(corruptTransients.EC_locations.shape[0]):
+                corruptTransients.EC_locations[j] = self.artifact_locations[corruptTransients.EC_locations[j]]
+        if any(corruptTransients.motion_locations):
+            for k in range(corruptTransients.motion_locations.shape[0]):
+                corruptTransients.motion_locations[k] = self.artifact_locations[corruptTransients.motion_locations[k]]
+        if any(corruptTransients.LP_locations):
+            for i in range(corruptTransients.LP_locations.shape[0]):
+                corruptTransients.LP_locations[i] = self.artifact_locations[corruptTransients.LP_locations[i]]
 
-        self.ghost_locations, self.EC_locations, self.motion_locations, self.LP_locations = tm_corr.ghost_locations, tm_corr.EC_locations, tm_corr.motion_locations, tm_corr.LP_locations
+        self.ghost_locations, self.EC_locations, self.motion_locations, self.LP_locations = corruptTransients.ghost_locations, corruptTransients.EC_locations, corruptTransients.motion_locations, corruptTransients.LP_locations
 
         # return to fids
         self.fids[self.edit_on == 1] = to_fids(on_specs)
@@ -551,8 +611,21 @@ class TransientMaker:
 
 
 def to_fids(in_specs):
+    '''
+    Convert SPECs (frequency domain) to FIDs (time domain).
+
+    :param in_specs: SPECs
+    :return: FIDs
+    '''
+
     return np.fft.fft(np.fft.fftshift(in_specs, axes=1), axis=1)
 
 
 def to_specs(in_fids):
+    '''
+    Convert FIDs (time domain) to SPECs (frequency domain).
+
+    :param in_fids: FIDs
+    :return: SPECs
+    '''
     return np.fft.fftshift(np.fft.ifft(in_fids, axis=1), axes=1)
