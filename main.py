@@ -14,10 +14,10 @@ totalGroundTruths = 100                                                       # 
 transient_count = 160                                                         # Number of Difference Transients in Scan
 
 # Location (Directory) Containing the Following Information
-ON_fid_gt_location = "C:/Users/Hanna B/Desktop/Research/Thesis_Project/SpecArtifactGen/inputs/fidsON_QA_Test_2048_GTs.npy"
-OFF_fid_gt_location = "C:/Users/Hanna B/Desktop/Research/Thesis_Project/SpecArtifactGen/inputs/fidsOFF_QA_Test_2048_GTs.npy"
-ppm_location = "C:/Users/Hanna B/Desktop/Research/Thesis_Project/SpecArtifactGen/inputs/on_ppm_2048.csv"
-time_location = "C:/Users/Hanna B/Desktop/Research/Thesis_Project/SpecArtifactGen/inputs/on_t_2048.csv"
+ON_fid_gt_location ="C:/project/location/ON_FIDS.npy"
+OFF_fid_gt_location ="C:/project/location/OFF_FIDS.npy"
+ppm_location ="C:/project/location/ppm.csv"
+time_location = "C:/project/location/time.csv"
 
 #######################################################################################################################
 # CREATION OF 'NORMAL' TRANSIENTS FROM BASE FID
