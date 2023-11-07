@@ -2,14 +2,14 @@
 GABA-Edited artifact simulation toolbox for simulating spurious echoes (ghosting artifact), eddy currents, lipid contamination and different degrees of motion contamination.
 
 # Basic Usage
-Example usage can be found in main.py.
-For adding artifacts:
-1.) Load ground truths (GTs)
-2.) Create a transient maker object (TYPICAL) from a GT using TransientMaker()
-3.) Add small noise to TYPICAL
-4.) Create a second transient maker object (CORRUPT) from the same GT used for TYPICAL
-5.) Add select artifacts
-6.) Use the insert_corrupt function to insert CORRUPT into random locations within TYPICAL
+Example usage can be found in main.py.\
+For adding artifacts:\
+1.) Load ground truths (GTs)\
+2.) Create a transient maker object (TYPICAL) from a GT using TransientMaker()\
+3.) Add small noise to TYPICAL\
+4.) Create a second transient maker object (CORRUPT) from the same GT used for TYPICAL\
+5.) Add select artifacts\
+6.) Use the insert_corrupt function to insert CORRUPT into random locations within TYPICAL\
 7.) Graph and save TYPICAL
 
 # transient_maker Class
