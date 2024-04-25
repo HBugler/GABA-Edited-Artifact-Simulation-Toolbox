@@ -1,47 +1,28 @@
 # GABA-Edited-Artifact-Simulation-Toolbox
-GABA-Edited artifact simulation toolbox for simulating spurious echoes (ghosting artifact), eddy currents, lipid contamination and different degrees of motion contamination.
+GABA-Edited artifact simulation toolbox for simulating spurious echoes (ghosting artifact), eddy currents, lipid contamination and different degrees of motion contamination ('subtle', 'progressive', and 'disruptive').\
+The GettingStarted notebook, fids, ppm, and time files can be used to sample the toolbox.\
+The gaba_edited_artifact_simulation_toolbox python file contains all functions presented below.
 
 # Basic Usage
 Example usage can be found in main.py.\
 For adding artifacts:\
 1.) Load ground truths (GTs).\
-2.) Create a transient maker object (TYPICAL) from a GT using TransientMaker().\
-3.) Add small noise to TYPICAL.\
-4.) Create a second transient maker object (CORRUPT) from the same GT used for TYPICAL.\
-5.) Add select artifacts.\
-6.) Use the insert_corrupt function to insert CORRUPT into random locations within TYPICAL.\
-7.) Graph and save TYPICAL.
+2.) Simulate a scan with arbitrary number of ON and OFF pairs.\
+3.) Add selected artifacts.\
+4.) Visualize artifacts and save data.
 
-# transient_maker Class
-Class functions are divided by usage:
-
-Domain Functions\
-reset_fids(), get_fids(), get_specs(), get_differenceSpecs(), get_differenceFids(), to_fids(), to_specs(), and insert_corrupt()
-
-Typical Noise Functions\
-add_time_domain_noise(): add Gaussian white (amplitude) noise with user standard deviation.\
-add_phase_shift_random(): add random normal phase shifts with user standard deviation to mimic small motion.\
-add_frequency_shift_random(): add random normal frequency shifts with user standard deviation to mimic small motion.\
-add_freq_shift_linear(): add  
-
-Artifact Functions\
+# Artifact Functions
 add_ghost_artifact(): add spurious echo artifact with user input for number, start and end time of the echo, amplitude, phase and chemical shift of the artifact.\
-add_EddyCurrent_artifact(): add eddy current artifact with user input for number, amplitude and time constant of the artifact.\
-motion_lineBroad_artifact(): add line broadening artifact associated with large motion with user input number, amplitude and lineshape variance of the artifact.\
-motion_baseline_artifact(): add whole baseline contamination associated with large motion.\
-lipid_peak_contamination(): add lipid peak contamination with user input for number of artifacts.\
-lipid_baseline_contamination(): add constrained baseline contamination associated with lipid contamination.
+add_eddy_current_artifact(): add eddy current artifact with user input for number, amplitude and time constant of the artifact.\
+add_subtle_motion_artifact(): add small random frequency and phase shifts constrained within a range.\
+add_progressive_motion_artifact(): add linear frequency shift over multiple consecutive scans to simulate participant falling asleep with head drift.\
+add_disruptive_motion_artifact(): add line broadening and baseline contamination associated with large scale motion such as coughing.\
+add_lipid_artifact(): add lipid peak contamination and constrained baseline associated with lipid contamination.
 
-Metric Functions\
-get_SNR(): calculates the SNR of the GABA peak from the difference spectrum. Can be applied to a single difference transient or list of difference transients.\
-get_LW(): calculates the GABA linewidth (FWHM) from the difference spectrum. Can be applied to a single difference transient or list of difference transients.\
-get_ShapeScore(): calculates the correlation between the GABA and GLX peak from the ground truth and degraded difference transient as per Berto et al (2023).\
-get_OutlierScore(): calculates, for a single difference transient, the percentage of points within a frequency window that are 3 standard deviations from the mean.
-
-Output Summary Functions\
-print_results()
-
-# Display File
-display_artifact(): graphs the first difference transient containing the requested artifact in the frequency and time domains along with their ground truths.\
-display_transToDate(): graphs the difference transients in their current state in the frequency domain with the corresponding ground truth.\
-saveData(): saves the frequency and time domain complex data to an .npy file.
+# Helper Functions
+to_fids(): converts specs to time domain fids.\
+to_specs(): converts fids to frequency domain specs.\
+interleave(): interleaves data to be in order of collection.\
+undo_interleave(): undoes interleaving to have distinct ON and OFF transient arrays.\
+scale(): scales the data to work with default values.\
+undo_scale(): undoes the scaling done to the data with scaling factor.\
